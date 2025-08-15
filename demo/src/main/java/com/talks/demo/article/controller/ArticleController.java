@@ -209,7 +209,7 @@ public class ArticleController {
         });
 
         //存入緩存
-        redisTemplate.opsForValue().set(LATEST_ARTICLES_KEY, articles, 30, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(LATEST_ARTICLES_KEY, articles, 5, TimeUnit.SECONDS);
 
         return articles;
     }
