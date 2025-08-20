@@ -63,6 +63,6 @@ public class Login {
 
     @GetMapping("/ping")
     public String ping() {
-        return "pong!";
+        return "pong?";
     }
 }

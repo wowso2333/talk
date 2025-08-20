@@ -51,7 +51,7 @@ public class ArticleController {
 
     @GetMapping("/test")
     public String tryApi() {
-        return "test!!";
+        return "test??";
     }
 
 
@@ -253,7 +253,7 @@ public class ArticleController {
         // 刷新該文章的緩存
         String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;    // 根據 articleId 動態生成 Redis 鍵
         ArticleDTO specificArticle = userMapper.selectArticleById(articleId);
-        redisTemplate.opsForValue().set(redisKey, specificArticle, 30, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(redisKey, specificArticle, 20, TimeUnit.SECONDS);
     }
 
     //刪除文章
@@ -467,7 +467,6 @@ public class ArticleController {
 
     @GetMapping("/suggest")
     public List<String> suggestTitles(@RequestParam String keyword) {
-
         return userMapper.suggestTitles(keyword);
     }
 
