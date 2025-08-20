@@ -17,7 +17,7 @@ export const getSignedUrl = async (file) => {
     formData.append('image', file);
 
     try {
-        const response = await axios.post('https://talks-production.up.railway.app/cloud/uploadImg', formData, {
+        const response = await axios.post('http://localhost:8080/cloud/uploadImg', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data' // 這裡會自動處理
             },
@@ -31,7 +31,7 @@ export const getSignedUrl = async (file) => {
 
 export async function deleteImage(imageUrl) {
     try {
-        const response = await axios.delete('https://talks-production.up.railway.app/cloud/deleteImg', {
+        const response = await axios.delete('http://localhost:8080/cloud/deleteImg', {
             params: {
                 imageUrl: imageUrl
             }
@@ -46,7 +46,7 @@ export async function deleteImage(imageUrl) {
 
 export async function getUserInformation(username){
     try{
-        const response = await axios.get('https://talks-production.up.railway.app/article/getUerInformation',{
+        const response = await axios.get('http://localhost:8080/article/getUerInformation',{
             params:{
                 username : username
             }
@@ -61,7 +61,7 @@ export async function getUserInformation(username){
 
 export async function addArticle(article){
     try{
-        const response = await axios.post('https://talks-production.up.railway.app/article/add', article)
+        const response = await axios.post('http://localhost:8080/article/add', article)
         return response.data;
 
     }catch(error){
@@ -73,7 +73,7 @@ export async function addArticle(article){
 // 加入收藏
 export async function addFavoriteBoard(userId, boardId){
     try{
-        const response = await axios.post('https://talks-production.up.railway.app/user/addFavoriteBoard', { 
+        const response = await axios.post('http://localhost:8080/user/addFavoriteBoard', { 
             userId : userId,  
             boardId : boardId
         })
@@ -87,7 +87,7 @@ export async function addFavoriteBoard(userId, boardId){
 // 取消收藏
 export async function removeFavoriteBoard(userId, boardId){
     try{
-        const response = await axios.delete(`https://talks-production.up.railway.app/user/removeFavoriteBoard`, {
+        const response = await axios.delete(`http://localhost:8080/user/removeFavoriteBoard`, {
             params: {
                 userId: userId,
                 boardId: boardId
@@ -103,7 +103,7 @@ export async function removeFavoriteBoard(userId, boardId){
 
 export async function getPopularArticle(){
     try{
-        const response = await axios.get('https://talks-production.up.railway.app/article/popular')
+        const response = await axios.get('http://localhost:8080/article/popular')
         return response.data
     }catch(error){
         console.log('Failed to getPopularArticle:', error)
@@ -113,7 +113,7 @@ export async function getPopularArticle(){
 
 export async function getLatestArticle(){
     try{
-        const response = await axios.get('https://talks-production.up.railway.app/article/latest')
+        const response = await axios.get('http://localhost:8080/article/latest')
         return response.data
     }catch(error){
         console.log('Failed to getPopularArticle:', error)
@@ -123,7 +123,7 @@ export async function getLatestArticle(){
 
 export async function getFavoriteBoardId(userId){
     try{
-        const response = await axios.get('https://talks-production.up.railway.app/user/getFavoriteBoardId', {
+        const response = await axios.get('http://localhost:8080/user/getFavoriteBoardId', {
           params : {
             userId : userId
         }})
@@ -137,7 +137,7 @@ export async function getFavoriteBoardId(userId){
 
 export async function getFavBoardArticles(boardIds) {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/article/getFavBoardArticles', {
+        const response = await axios.get('http://localhost:8080/article/getFavBoardArticles', {
             params: { 
                 boardIds: boardIds
             },
@@ -158,7 +158,7 @@ export async function getFavBoardArticles(boardIds) {
 // 獲取指定版的文章
 export async function getSpecifyBoardArticle(boardName) {
     try {
-        const response = await axios.get(`https://talks-production.up.railway.app/article/getSpecifyBoard/${boardName}`);
+        const response = await axios.get(`http://localhost:8080/article/getSpecifyBoard/${boardName}`);
         return response.data;
     } catch (error) {
         console.error('Failed to getSpecifyBoardArticles:', error);
@@ -170,7 +170,7 @@ export async function getSpecifyBoardArticle(boardName) {
 // 獲取指定文章
 export async function getArticleById(articleId) {
     try {
-        const response = await axios.get(`https://talks-production.up.railway.app/article/getArticleById/${articleId}`);
+        const response = await axios.get(`http://localhost:8080/article/getArticleById/${articleId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to getArticleById:', error);
@@ -181,7 +181,7 @@ export async function getArticleById(articleId) {
 // 增加文章的 love
 export async function incrementArticleLove(articleId) {
     try {
-        const response = await axios.post(`https://talks-production.up.railway.app/article/incrementLove/${articleId}`);
+        const response = await axios.post(`http://localhost:8080/article/incrementLove/${articleId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to incrementArticleLove:', error);
@@ -192,7 +192,7 @@ export async function incrementArticleLove(articleId) {
 // 減少文章的 love
 export async function decrementArticleLove(articleId) {
     try {
-        const response = await axios.post(`https://talks-production.up.railway.app/article/decrementLove/${articleId}`);
+        const response = await axios.post(`http://localhost:8080/article/decrementLove/${articleId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to incrementArticleLove:', error);
@@ -203,7 +203,7 @@ export async function decrementArticleLove(articleId) {
 // 新增留言
 export async function addMessage(message) {
     try {
-        const response = await axios.post('https://talks-production.up.railway.app/message/addMessage', message
+        const response = await axios.post('http://localhost:8080/message/addMessage', message
         );
         return response.data;
     } catch (error) {
@@ -215,7 +215,7 @@ export async function addMessage(message) {
 // 新增留言愛心
 export async function incrementMessageLove(messageId) {
     try {
-        const response = await axios.post(`https://talks-production.up.railway.app/message/incrementMessageLove/${messageId}`);
+        const response = await axios.post(`http://localhost:8080/message/incrementMessageLove/${messageId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to incrementMessageLove:', error);
@@ -226,7 +226,7 @@ export async function incrementMessageLove(messageId) {
 // 新增留言愛心
 export async function decrementMessageLove(messageId) {
     try {
-        const response = await axios.post(`https://talks-production.up.railway.app/message/decrementMessageLove/${messageId}`);
+        const response = await axios.post(`http://localhost:8080/message/decrementMessageLove/${messageId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to incrementMessageLove:', error);
@@ -237,7 +237,7 @@ export async function decrementMessageLove(messageId) {
 // 根據文章 ID 獲取留言
 export async function getMessagesByArticleId(articleId) {
     try {
-        const response = await axios.get(`https://talks-production.up.railway.app/message/getMessagesByArticleId/${articleId}`);
+        const response = await axios.get(`http://localhost:8080/message/getMessagesByArticleId/${articleId}`);
         return response.data;
     } catch (error) {
         console.error('Failed to getMessagesByArticleId:', error);
@@ -248,7 +248,7 @@ export async function getMessagesByArticleId(articleId) {
 //取得推薦看板資料
 export async function getRecommendBoardsInformation() {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/article/getRecommendBoards');
+        const response = await axios.get('http://localhost:8080/article/getRecommendBoards');
         return response.data;
     } catch (error) {
         console.log('Failed to getRecommendBoards:', error);
@@ -259,7 +259,7 @@ export async function getRecommendBoardsInformation() {
 //取得所有看板資料
 export async function getAllBoardsInformation() {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/article/getAllBoards');
+        const response = await axios.get('http://localhost:8080/article/getAllBoards');
         return response.data;
     } catch (error) {
         console.log('Failed to getRecommendBoards:', error);
@@ -270,7 +270,7 @@ export async function getAllBoardsInformation() {
 //取得頭像
 export async function getAvatar(userId) {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/article/getAvatarUrl',{
+        const response = await axios.get('http://localhost:8080/article/getAvatarUrl',{
             params: { 
                 userId: userId
         }
@@ -285,7 +285,7 @@ export async function getAvatar(userId) {
 //取得用戶發的文
 export async function getArticlesByUserId(userId) {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/article/getArticlesByUserId',{
+        const response = await axios.get('http://localhost:8080/article/getArticlesByUserId',{
             params: { 
                 userId: userId
         }
@@ -300,7 +300,7 @@ export async function getArticlesByUserId(userId) {
 //刪除文章
 export async function deleteArticle(articleId) {
     try {
-        const response = await axios.delete('https://talks-production.up.railway.app/article/delete', {
+        const response = await axios.delete('http://localhost:8080/article/delete', {
             params: {
                 articleId: articleId
             }
@@ -316,7 +316,7 @@ export async function deleteArticle(articleId) {
 //取得用戶追蹤看板資訊
 export async function getFavoriteBoardInfo(userId) {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/user/getFavoriteBoardInfo',{
+        const response = await axios.get('http://localhost:8080/user/getFavoriteBoardInfo',{
             params: { 
                 userId: userId
         }
@@ -331,7 +331,7 @@ export async function getFavoriteBoardInfo(userId) {
 //更改密碼
 export async function changePassword(password, userId){
     try{
-        const response = await axios.post('https://talks-production.up.railway.app/user/updatePassword', { 
+        const response = await axios.post('http://localhost:8080/user/updatePassword', { 
             userId : userId,  
             password : password
         })
@@ -345,7 +345,7 @@ export async function changePassword(password, userId){
 //刪除帳號
 export async function deleteAccount(userId) {
     try {
-        const response = await axios.delete('https://talks-production.up.railway.app/user/deleteAccount', {
+        const response = await axios.delete('http://localhost:8080/user/deleteAccount', {
             params: {
                 userId: userId
             }
@@ -361,7 +361,7 @@ export async function deleteAccount(userId) {
 //更改密碼
 export async function updateArticle(article){
     try{
-        const response = await axios.post('https://talks-production.up.railway.app/article/edit', article)
+        const response = await axios.post('http://localhost:8080/article/edit', article)
         return response.data
     }catch(error){
         console.log('Failed to update article:', error)
@@ -375,7 +375,7 @@ export const executeAuthenticationService = async(username, password) => {
         password: password
     };
 
-    return axios.post('https://talks-production.up.railway.app/login', params, {
+    return axios.post('http://localhost:8080/login', params, {
         headers: {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache',
@@ -386,7 +386,7 @@ export const executeAuthenticationService = async(username, password) => {
 // 自動補字：根據關鍵字建議標題
 export async function suggestTitles(keyword) {
     try {
-        const response = await axios.get('https://talks-production.up.railway.app/article/suggest', {
+        const response = await axios.get('http://localhost:8080/article/suggest', {
             params: { keyword }
         });
         return response.data; // 回傳字串陣列
@@ -399,7 +399,7 @@ export async function suggestTitles(keyword) {
 
 export async function searchKeyWord(keyword) {
     try {
-      const response = await axios.get('https://talks-production.up.railway.app/article/search', {
+      const response = await axios.get('http://localhost:8080/article/search', {
         params: { keyword }
       });
       return response.data;
@@ -412,7 +412,7 @@ export async function searchKeyWord(keyword) {
 // 贊助本站
 export async function donate(articleId = 0, amount) {
   try {
-    const res = await axios.post('https://talks-production.up.railway.app/donate/create', null, {
+    const res = await axios.post('http://localhost:8080/donate/create', null, {
       params: { articleId, amount } // 後端只收這兩個參數
     });
     return res.data; // HTML 字串

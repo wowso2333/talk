@@ -46,6 +46,7 @@ export default function EditComponent() {
             setTitle(article.title);
             articleEditorRef.current.innerHTML = article.content;
             setBorder(article.board);
+            setBoardId(article.boardId);
         } catch (error) {
             console.error('Failed to load article:', error);
         }

@@ -216,51 +216,56 @@ export default function SearchResultComponent() {
                                     <div className="mt-4">
 
                                         {/* 列出所有文章 */}
-                                        {Array.isArray(articles) && articles.map((article) => (
-                                            
-                                            <div key = 
-                                                {article.articleId} 
-                                                className='d-flex border-bottom' 
-                                                style={{ height: 'auto' }}
-                                                onClick={() => handleShow(article.articleId)} // 點擊文章時顯示模態視窗
-                                            >
-                                                <div className='py-3'>
+                                        {Array.isArray(articles) && articles.length > 0 ? articles.map(
+                                            (article) => (
+                                                <div key = 
+                                                    {article.articleId} 
+                                                    className='d-flex border-bottom' 
+                                                    style={{ height: 'auto' }}
+                                                    onClick={() => handleShow(article.articleId)} // 點擊文章時顯示模態視窗
+                                                >
+                                                    <div className='py-3'>
 
-                                                    <div className='mb-2 mainPage_gray h5'>
-                                                        <span>{ article.board }</span>
-                                                        <span className='mainPage_spaceTab'> · </span>
+                                                        <div className='mb-2 mainPage_gray h5'>
+                                                            <span>{ article.board }</span>
+                                                            <span className='mainPage_spaceTab'> · </span>
 
-                                                        <span>{ article.username }</span>
-                                                        <span className='mainPage_spaceTab'> · </span>
+                                                            <span>{ article.username }</span>
+                                                            <span className='mainPage_spaceTab'> · </span>
 
-                                                        <span>{formatTime(article.time)}</span>
+                                                            <span>{formatTime(article.time)}</span>
+                                                        </div>
+
+                                                        <div className='mt-3 mb-3 fw-bold h2 mainPage_deepGray fs-3'>{article.title}</div>
+
+                                                        <h5 className='mb-3 mainPage_deepGray'>
+                                                            {article.firstImgUrl.trim() !== ''
+                                                                ? `${article.content.substring(0, 38)}...`
+                                                                : `${article.content}...`}
+                                                        </h5>
+
+                                                        <div className="d-flex align-items-center">
+                                                            <FontAwesomeIcon icon={faGratipay} color="#fa3b2ae5" className='mainPage_iconSize'/>
+                                                            <h5 className="ms-1 mainPage_gray m-0" style={{ lineHeight: '25px' }}>{article.love}</h5>
+                                                            <i className="ms-4 bi bi-chat-heart-fill mainPage_Blue mainPage_iconSize"></i>
+                                                            <h5 className="ms-1 mainPage_gray m-0" style={{ lineHeight: '25px' }}>{article.messageCount}</h5>
+                                                        </div>
                                                     </div>
 
-                                                    <div className='mt-3 mb-3 fw-bold h2 mainPage_deepGray fs-3'>{article.title}</div>
-
-                                                    <h5 className='mb-3 mainPage_deepGray'>
-                                                        {article.firstImgUrl.trim() !== ''
-                                                            ? `${article.content.substring(0, 38)}...`
-                                                            : `${article.content}...`}
-                                                    </h5>
-
-                                                    <div className="d-flex align-items-center">
-                                                        <FontAwesomeIcon icon={faGratipay} color="#fa3b2ae5" className='mainPage_iconSize'/>
-                                                        <h5 className="ms-1 mainPage_gray m-0" style={{ lineHeight: '25px' }}>{article.love}</h5>
-                                                        <i className="ms-4 bi bi-chat-heart-fill mainPage_Blue mainPage_iconSize"></i>
-                                                        <h5 className="ms-1 mainPage_gray m-0" style={{ lineHeight: '25px' }}>{article.messageCount}</h5>
-                                                    </div>
+                                                    { article.firstImgUrl.trim() && 
+                                                        <div className='d-flex align-items-start ms-auto pb-3 pt-5' style={{ height: 'auto' }}>
+                                                            <img src={article.firstImgUrl}
+                                                                alt={article.firstImgUrl}
+                                                                className='mainPage_ArticleImg'
+                                                            />
+                                                        </div>}
                                                 </div>
-
-                                                { article.firstImgUrl.trim() && 
-                                                    <div className='d-flex align-items-start ms-auto pb-3 pt-5' style={{ height: 'auto' }}>
-                                                        <img src={article.firstImgUrl}
-                                                            alt={article.firstImgUrl}
-                                                            className='mainPage_ArticleImg'
-                                                        />
-                                                    </div>}
-                                            </div>
-                                        ))}
+                                            )
+                                        ):(
+                                                <div className="text-center text-muted py-5">
+                                                    無相關文章
+                                                </div>
+                                        )}
 
                                         {/* 模態視窗 */}
                                         {selectedArticle &&               
