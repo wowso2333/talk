@@ -10,7 +10,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # === 階段二：使用精簡版 JDK 運行 ===
-FROM openjdk:21-jdk-slim-bullseye
+FROM eclipse-temurin:21-jdk-jammy
 
 # 安裝工具包
 RUN apt-get update && apt-get install -y iputils-ping default-mysql-client
