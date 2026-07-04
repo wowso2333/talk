@@ -58,7 +58,7 @@ public class ArticleController {
     // 測試redis
     @GetMapping("/redis/get")
     public Object getRedisValue(@RequestParam String key) {
-        Object value = redisTemplate.opsForValue().get(key);
+        Object value = getCache(key);
         if (value != null) {
             return "Key 的值為: " + value.toString();
         } else {
@@ -126,7 +126,7 @@ public class ArticleController {
     public List<ArticleDTO> getHotArticle(){
         try {
             // 先從 Redis 查詢熱門文章緩存
-            List<ArticleDTO> hotArticle =  (List<ArticleDTO>) redisTemplate.opsForValue().get(POPULAR_ARTICLES_KEY);
+            List<ArticleDTO> hotArticle =  (List<ArticleDTO>) getCache(POPULAR_ARTICLES_KEY);
 
             if(hotArticle == null){
                 hotArticle = refreshHotArticle();
@@ -158,11 +158,11 @@ public class ArticleController {
             article.setFirstImgUrl(imageUrl);
 
             // 將文章的 articleId 加入到熱門文章的 Set 中
-            redisTemplate.opsForSet().add("hotArticleIds", article.getArticleId());
+            addCacheSetMember("hotArticleIds", article.getArticleId());
         });
 
         // 將結果存入 Redis 並設置過期時間
-        redisTemplate.opsForValue().set(POPULAR_ARTICLES_KEY, articles, 30, TimeUnit.MINUTES);
+        setCache(POPULAR_ARTICLES_KEY, articles, 30, TimeUnit.MINUTES);
 
         return articles;
     }
@@ -172,7 +172,7 @@ public class ArticleController {
     public  ResponseEntity<?> getNewArticle(){
         try {
             // 先從 Redis 查詢熱門文章緩存
-            List<ArticleDTO> latestArticle =  (List<ArticleDTO>) redisTemplate.opsForValue().get(LATEST_ARTICLES_KEY);
+            List<ArticleDTO> latestArticle =  (List<ArticleDTO>) getCache(LATEST_ARTICLES_KEY);
 
             if(latestArticle == null){
                 latestArticle = refreshLatestArticle();
@@ -205,11 +205,11 @@ public class ArticleController {
             article.setFirstImgUrl(imageUrl);
 
             // 將文章的 articleId 加入到熱門文章的 Set 中
-            redisTemplate.opsForSet().add("latestArticleIds", article.getArticleId());
+            addCacheSetMember("latestArticleIds", article.getArticleId());
         });
 
         //存入緩存
-        redisTemplate.opsForValue().set(LATEST_ARTICLES_KEY, articles, 5, TimeUnit.SECONDS);
+        setCache(LATEST_ARTICLES_KEY, articles, 5, TimeUnit.SECONDS);
 
         return articles;
     }
@@ -226,12 +226,12 @@ public class ArticleController {
 
             // 刪除該文章的緩存
             String redisKey = SPECIFIC_ARTICLE_KEY + "_" + article.getArticleId();
-            redisTemplate.delete(redisKey);
+            deleteCache(redisKey);
 
             // 檢查該文章是否在熱門或最新文章集合中
             int articleId = article.getArticleId();
-            boolean isHotArticle = redisTemplate.opsForSet().isMember("hotArticleIds", articleId);
-            boolean isLatestArticle = redisTemplate.opsForSet().isMember("latestArticleIds", articleId);
+            boolean isHotArticle = isCacheSetMember("hotArticleIds", articleId);
+            boolean isLatestArticle = isCacheSetMember("latestArticleIds", articleId);
 
             // 如果文章是熱門文章或最新文章
             if (isHotArticle || isLatestArticle) {
@@ -253,7 +253,7 @@ public class ArticleController {
         // 刷新該文章的緩存
         String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;    // 根據 articleId 動態生成 Redis 鍵
         ArticleDTO specificArticle = userMapper.selectArticleById(articleId);
-        redisTemplate.opsForValue().set(redisKey, specificArticle, 20, TimeUnit.SECONDS);
+        setCache(redisKey, specificArticle, 20, TimeUnit.SECONDS);
     }
 
     //刪除文章
@@ -343,7 +343,7 @@ public class ArticleController {
             String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;
 
             //  從 Redis 查詢熱門文章緩存
-            Object cachedArticle = redisTemplate.opsForValue().get(redisKey);
+            Object cachedArticle = getCache(redisKey);
             ArticleDTO specificArticle = null;
 
             if (cachedArticle != null) {
@@ -352,7 +352,7 @@ public class ArticleController {
             } else {
                 specificArticle = userMapper.selectArticleById(articleId);
                 // 將結果存入 Redis 並設置過期時間
-                redisTemplate.opsForValue().set(redisKey, specificArticle, 30, TimeUnit.MINUTES);
+                setCache(redisKey, specificArticle, 30, TimeUnit.MINUTES);
             }
 
             return ResponseEntity.ok(specificArticle);
@@ -372,7 +372,7 @@ public class ArticleController {
 
             // 刪除Redis中的緩存
             String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;
-            redisTemplate.delete(redisKey);
+            deleteCache(redisKey);
 
             if (result > 0) {
                 return ResponseEntity.ok("Article love count incremented successfully.");
@@ -392,7 +392,7 @@ public class ArticleController {
 
             // 刪除Redis中的緩存
             String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;
-            redisTemplate.delete(redisKey);
+            deleteCache(redisKey);
 
             if (result > 0) {
                 return ResponseEntity.ok("Article love count decremented successfully.");
@@ -422,12 +422,12 @@ public class ArticleController {
 
         try {
             // 先從 Redis 查詢熱門文章緩存
-            List<Board> allBoards =  (List<Board>) redisTemplate.opsForValue().get(ALL_BOARDS_KEY);
+            List<Board> allBoards =  (List<Board>) getCache(ALL_BOARDS_KEY);
 
             if(allBoards == null){
                 allBoards = userMapper.selectAllBoards();
                 //存入緩存
-                redisTemplate.opsForValue().set(ALL_BOARDS_KEY, allBoards, 60, TimeUnit.DAYS);
+                setCache(ALL_BOARDS_KEY, allBoards, 60, TimeUnit.DAYS);
             }
 
             return ResponseEntity.ok(allBoards);
@@ -493,6 +493,48 @@ public class ArticleController {
         return ResponseEntity.ok(articles);
     }
 
-}
+    private Object getCache(String key) {
+        try {
+            return redisTemplate.opsForValue().get(key);
+        } catch (Exception e) {
+            logger.warn("Redis get failed, fallback to DB. key={}", key, e);
+            return null;
+        }
+    }
 
+    private void setCache(String key, Object value, long timeout, TimeUnit unit) {
+        try {
+            redisTemplate.opsForValue().set(key, value, timeout, unit);
+        } catch (Exception e) {
+            logger.warn("Redis set failed, return DB data directly. key={}", key, e);
+        }
+    }
+
+    private void deleteCache(String key) {
+        try {
+            redisTemplate.delete(key);
+        } catch (Exception e) {
+            logger.warn("Redis delete failed. key={}", key, e);
+        }
+    }
+
+    private void addCacheSetMember(String key, Object value) {
+        try {
+            redisTemplate.opsForSet().add(key, value);
+        } catch (Exception e) {
+            logger.warn("Redis set add failed. key={}, value={}", key, value, e);
+        }
+    }
+
+    private boolean isCacheSetMember(String key, Object value) {
+        try {
+            Boolean isMember = redisTemplate.opsForSet().isMember(key, value);
+            return Boolean.TRUE.equals(isMember);
+        } catch (Exception e) {
+            logger.warn("Redis set isMember failed. key={}, value={}", key, value, e);
+            return false;
+        }
+    }
+
+}
 
