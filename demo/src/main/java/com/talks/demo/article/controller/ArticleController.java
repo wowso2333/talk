@@ -103,6 +103,7 @@ public class ArticleController {
             article.setContent(sanitizedContent);
 
             userMapper.addArticle(article);
+            invalidateArticleCaches(null);
             return "add article success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,9 +157,6 @@ public class ArticleController {
             Element img = doc.select("img").first(); // 選擇第一個 <img> 標籤
             String imageUrl = img != null ? img.attr("src") : "";
             article.setFirstImgUrl(imageUrl);
-
-            // 將文章的 articleId 加入到熱門文章的 Set 中
-            addCacheSetMember("hotArticleIds", article.getArticleId());
         });
 
         // 將結果存入 Redis 並設置過期時間
@@ -203,9 +201,6 @@ public class ArticleController {
             Element img = doc.select("img").first(); // 選擇第一個 <img> 標籤
             String imageUrl = img != null ? img.attr("src") : "";
             article.setFirstImgUrl(imageUrl);
-
-            // 將文章的 articleId 加入到熱門文章的 Set 中
-            addCacheSetMember("latestArticleIds", article.getArticleId());
         });
 
         //存入緩存
@@ -223,20 +218,7 @@ public class ArticleController {
             article.setContent(sanitizedContent);
 
             userMapper.updateArticle(article);
-
-            // 刪除該文章的緩存
-            String redisKey = SPECIFIC_ARTICLE_KEY + "_" + article.getArticleId();
-            deleteCache(redisKey);
-
-            // 檢查該文章是否在熱門或最新文章集合中
-            int articleId = article.getArticleId();
-            boolean isHotArticle = isCacheSetMember("hotArticleIds", articleId);
-            boolean isLatestArticle = isCacheSetMember("latestArticleIds", articleId);
-
-            // 如果文章是熱門文章或最新文章
-            if (isHotArticle || isLatestArticle) {
-                refreshCache(articleId);
-            }
+            invalidateArticleCaches(article.getArticleId());
 
             return "edit article success";
         } catch (Exception e) {
@@ -245,22 +227,12 @@ public class ArticleController {
         }
     }
 
-    // 刷新緩存
-    private void refreshCache(int articleId) {
-        refreshHotArticle();  // 刷新熱門文緩存
-        refreshLatestArticle(); // 刷新最新文章緩存
-
-        // 刷新該文章的緩存
-        String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;    // 根據 articleId 動態生成 Redis 鍵
-        ArticleDTO specificArticle = userMapper.selectArticleById(articleId);
-        setCache(redisKey, specificArticle, 20, TimeUnit.SECONDS);
-    }
-
     //刪除文章
     @DeleteMapping("/delete")
     public String deleteArticle(@RequestParam int articleId){
         try {
             userMapper.deleteArticle(articleId);
+            invalidateArticleCaches(articleId);
             return "delete article success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -370,11 +342,8 @@ public class ArticleController {
         try {
             int result = userMapper.incrementArticleLove(articleId);
 
-            // 刪除Redis中的緩存
-            String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;
-            deleteCache(redisKey);
-
             if (result > 0) {
+                invalidateSpecificArticleCache(articleId);
                 return ResponseEntity.ok("Article love count incremented successfully.");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Article not found.");
@@ -390,11 +359,8 @@ public class ArticleController {
         try {
             int result = userMapper.decrementArticleLove(articleId);
 
-            // 刪除Redis中的緩存
-            String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;
-            deleteCache(redisKey);
-
             if (result > 0) {
+                invalidateSpecificArticleCache(articleId);
                 return ResponseEntity.ok("Article love count decremented successfully.");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Article not found.");
@@ -518,23 +484,17 @@ public class ArticleController {
         }
     }
 
-    private void addCacheSetMember(String key, Object value) {
-        try {
-            redisTemplate.opsForSet().add(key, value);
-        } catch (Exception e) {
-            logger.warn("Redis set add failed. key={}, value={}", key, value, e);
+    private void invalidateArticleCaches(Integer articleId) {
+        deleteCache(POPULAR_ARTICLES_KEY);
+        deleteCache(LATEST_ARTICLES_KEY);
+
+        if (articleId != null) {
+            invalidateSpecificArticleCache(articleId);
         }
     }
 
-    private boolean isCacheSetMember(String key, Object value) {
-        try {
-            Boolean isMember = redisTemplate.opsForSet().isMember(key, value);
-            return Boolean.TRUE.equals(isMember);
-        } catch (Exception e) {
-            logger.warn("Redis set isMember failed. key={}, value={}", key, value, e);
-            return false;
-        }
+    private void invalidateSpecificArticleCache(int articleId) {
+        deleteCache(SPECIFIC_ARTICLE_KEY + "_" + articleId);
     }
 
 }
-
