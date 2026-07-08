@@ -41,6 +41,7 @@ public class ArticleController {
     private static final String LATEST_ARTICLES_KEY = "latest_articles";
     private static final String SPECIFIC_ARTICLE_KEY = "specific_articles";
     private static final String ALL_BOARDS_KEY = "all_boards";
+    private static final String NULL_ARTICLE_CACHE_VALUE = "__NULL_ARTICLE__";
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -310,6 +311,10 @@ public class ArticleController {
     @GetMapping("/getArticleById/{articleId}")
     public ResponseEntity<?> getArticleById(@PathVariable int articleId) {
         try {
+            // 避免查詢非法 ID，例如負數或 0
+            if (articleId <= 0) {
+                return ResponseEntity.badRequest().body("Invalid article ID");
+            }
 
             // 根據 articleId 動態生成 Redis 鍵
             String redisKey = SPECIFIC_ARTICLE_KEY + "_" + articleId;
@@ -318,11 +323,20 @@ public class ArticleController {
             Object cachedArticle = getCache(redisKey);
             ArticleDTO specificArticle = null;
 
+            // Redis 有資料
             if (cachedArticle != null) {
-                // 使用 ObjectMapper 將 LinkedHashMap 轉換為 ArticleDTO
+                // 快取的是「文章不存在」標記，直接回 404，避免打 DB（防穿透）
+                if (NULL_ARTICLE_CACHE_VALUE.equals(cachedArticle)) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Article not found.");
+                }
+                // 轉換為 ArticleDTO
                 specificArticle = objectMapper.convertValue(cachedArticle, ArticleDTO.class);
             } else {
                 specificArticle = userMapper.selectArticleById(articleId);
+                if (specificArticle == null) {
+                    setCache(redisKey, NULL_ARTICLE_CACHE_VALUE, 5, TimeUnit.MINUTES);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Article not found.");
+                }
                 // 將結果存入 Redis 並設置過期時間
                 setCache(redisKey, specificArticle, 30, TimeUnit.MINUTES);
             }
