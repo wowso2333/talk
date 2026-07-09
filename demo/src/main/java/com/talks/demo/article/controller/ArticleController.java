@@ -9,8 +9,7 @@ import org.jsoup.safety.Safelist;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
@@ -48,6 +47,9 @@ public class ArticleController {
 
     @Autowired
     private ObjectMapper objectMapper;  // 注入 ObjectMapper
+
+    @Value("${cache.ttl-jitter-percent:20}")
+    private int cacheTtlJitterPercent;
 
 
     @GetMapping("/test")
@@ -484,10 +486,23 @@ public class ArticleController {
 
     private void setCache(String key, Object value, long timeout, TimeUnit unit) {
         try {
-            redisTemplate.opsForValue().set(key, value, timeout, unit);
+            // 設定 Redis Key 的過期時間
+            redisTemplate.opsForValue().set(key, value, getJitteredTimeout(timeout), unit);
         } catch (Exception e) {
             logger.warn("Redis set failed, return DB data directly. key={}", key, e);
         }
+    }
+
+    // 產生隨機過期時間
+    private long getJitteredTimeout(long timeout) {
+        int jitterPercent = Math.max(cacheTtlJitterPercent, 0);
+        long jitter = timeout * jitterPercent / 100;
+
+        if (jitter <= 0) {
+            return timeout;
+        }
+
+        return timeout + ThreadLocalRandom.current().nextLong(jitter + 1);
     }
 
     private void deleteCache(String key) {
