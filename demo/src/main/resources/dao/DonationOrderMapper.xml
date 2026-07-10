@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.talks.demo.articleDao.dao.DonationOrderMapper">
+
+    <insert id="insert"
+            parameterType="com.talks.demo.articleDao.pojo.DonationOrder"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO donation_order (
+            merchant_trade_no,
+            article_id,
+            amount,
+            status,
+            ecpay_trade_no,
+            rtn_code,
+            rtn_msg,
+            paid_at
+        )
+        VALUES (
+            #{merchantTradeNo},
+            #{articleId},
+            #{amount},
+            #{status},
+            #{ecpayTradeNo},
+            #{rtnCode},
+            #{rtnMsg},
+            #{paidAt}
+        )
+    </insert>
+
+    <update id="markPaidSuccess">
+        UPDATE donation_order
+        SET status = 'SUCCESS',
+            ecpay_trade_no = #{ecpayTradeNo},
+            rtn_code = #{rtnCode},
+            rtn_msg = #{rtnMsg},
+            paid_at = COALESCE(paid_at, CURRENT_TIMESTAMP),
+            updated_at = CURRENT_TIMESTAMP
+        WHERE merchant_trade_no = #{merchantTradeNo}
+    </update>
+
+    <select id="findById" resultType="com.talks.demo.articleDao.pojo.DonationOrder">
+        SELECT
+            id,
+            merchant_trade_no,
+            article_id,
+            amount,
+            status,
+            ecpay_trade_no,
+            rtn_code,
+            rtn_msg,
+            created_at,
+            paid_at,
+            updated_at
+        FROM donation_order
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByMerchantTradeNo" resultType="com.talks.demo.articleDao.pojo.DonationOrder">
+        SELECT
+            id,
+            merchant_trade_no,
+            article_id,
+            amount,
+            status,
+            ecpay_trade_no,
+            rtn_code,
+            rtn_msg,
+            created_at,
+            paid_at,
+            updated_at
+        FROM donation_order
+        WHERE merchant_trade_no = #{merchantTradeNo}
+    </select>
+
+</mapper>
