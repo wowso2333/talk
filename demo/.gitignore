@@ -19,6 +19,8 @@ target/
 *.iml
 *.ipr
 
+.idea/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -35,3 +37,4 @@ build/
 
 .env
 .env.example
+

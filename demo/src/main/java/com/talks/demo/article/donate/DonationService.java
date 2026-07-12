@@ -1,48 +1,78 @@
 package com.talks.demo.article.donate;
 
+import com.talks.demo.articleDao.dao.DonationOrderMapper;
+import com.talks.demo.articleDao.pojo.DonationOrder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DonationService {
 
     private final EcpayConfig ecpayConfig;
+    private final DonationOrderMapper donationOrderMapper;
 
+    @Transactional
     public String createEcpayOrder(Long articleId, Double amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("amount must be greater than 0");
+        }
+
         String merchantTradeNo = genMerchantTradeNo();
         String tradeDesc = "donate";
         String itemName = "donate website";
-        String returnUrl = "https://talks-production.up.railway.app/donate/ecpay-callback";
-        String clientBackUrl = "https://talks-rust-tau.vercel.app/donate/success";
+        int totalAmount = amount.intValue();
+
+        DonationOrder donationOrder = new DonationOrder();
+        donationOrder.setMerchantTradeNo(merchantTradeNo);
+        donationOrder.setArticleId(articleId);
+        donationOrder.setAmount(BigDecimal.valueOf(totalAmount));
+        donationOrder.setStatus("PENDING");
+        donationOrderMapper.insert(donationOrder);
 
         Map<String, String> params = new HashMap<>();
         params.put("MerchantID", ecpayConfig.getMerchantId());
         params.put("MerchantTradeNo", merchantTradeNo);
-        params.put("MerchantTradeDate", "2023/03/12 15:30:23");
+        params.put("MerchantTradeDate", java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")));
         params.put("PaymentType", "aio");
-        params.put("TotalAmount", String.valueOf(amount.intValue()));
+        params.put("TotalAmount", String.valueOf(totalAmount));
         params.put("TradeDesc", tradeDesc);
         params.put("ItemName", itemName);
-        params.put("ReturnURL", returnUrl);
+        params.put("ReturnURL", ecpayConfig.getReturnUrl());
         params.put("ChoosePayment", "ALL");
-        params.put("ClientBackURL", clientBackUrl);
+        params.put("ClientBackURL", ecpayConfig.getClientBackUrl());
         params.put("EncryptType", "1");
+        log.info("Creating ECPay donation order. merchantTradeNo={}, returnUrl={}, clientBackUrl={}",
+                merchantTradeNo,
+                ecpayConfig.getReturnUrl(),
+                ecpayConfig.getClientBackUrl());
 
         Map<String, String> macParams = new HashMap<>(params);
 
         // 產生 CheckMacValue（原文）
-        String checkMacValue = EcpayUtil.generateCheckMacValue(macParams, "pwFHCqoQZGmho4w6", "EkRm7iFT261dpevs", 1);
+        String checkMacValue = EcpayUtil.generateCheckMacValue(macParams, ecpayConfig.getHashKey(), ecpayConfig.getHashIv(), 1);
         params.put("CheckMacValue", checkMacValue);
 
 
         // 生成自動送出表單 HTML
         return EcpayUtil.genAutoSubmitForm(params, ecpayConfig.getBaseUrl());
+    }
+
+    @Transactional
+    public int markPaidSuccess(String merchantTradeNo, String ecpayTradeNo, String rtnCode, String rtnMsg) {
+        int updatedRows = donationOrderMapper.markPaidSuccess(merchantTradeNo, ecpayTradeNo, rtnCode, rtnMsg);
+        if (updatedRows == 0) {
+            log.warn("ECPay paid callback did not match any donation order. merchantTradeNo={}", merchantTradeNo);
+        }
+        return updatedRows;
     }
 
     // 產生不重複的訂單編號（英數、<=20）

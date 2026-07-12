@@ -12,4 +12,6 @@ public class EcpayConfig {
     private String hashKey;
     private String hashIv;
     private String baseUrl;
+    private String returnUrl;
+    private String clientBackUrl;
 }

@@ -54,6 +54,22 @@ CREATE TABLE IF NOT EXISTS user_favorite_boards (
   CONSTRAINT fk_favorite_board FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS donation_order (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  merchant_trade_no VARCHAR(20) NOT NULL UNIQUE,
+  article_id INT DEFAULT NULL,
+  amount DECIMAL(10, 0) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  ecpay_trade_no VARCHAR(50) DEFAULT NULL,
+  rtn_code VARCHAR(20) DEFAULT NULL,
+  rtn_msg VARCHAR(255) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  paid_at TIMESTAMP NULL DEFAULT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_donation_order_article_id (article_id),
+  INDEX idx_donation_order_status (status)
+);
+
 INSERT INTO user (id, username, password, role, enabled, avatar)
 VALUES
   (1, 'admi', 'aaa', 'ROLE_USER', TRUE, 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/yellowPinkET.png')
