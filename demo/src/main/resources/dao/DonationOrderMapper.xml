@@ -39,6 +39,7 @@
             paid_at = COALESCE(paid_at, CURRENT_TIMESTAMP),
             updated_at = CURRENT_TIMESTAMP
         WHERE merchant_trade_no = #{merchantTradeNo}
+          AND status != 'SUCCESS'
     </update>
 
     <select id="findById" resultType="com.talks.demo.articleDao.pojo.DonationOrder">

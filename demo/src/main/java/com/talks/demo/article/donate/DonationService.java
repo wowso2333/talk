@@ -68,9 +68,23 @@ public class DonationService {
 
     @Transactional
     public int markPaidSuccess(String merchantTradeNo, String ecpayTradeNo, String rtnCode, String rtnMsg) {
+        DonationOrder existingOrder = donationOrderMapper.findByMerchantTradeNo(merchantTradeNo);
+        if (existingOrder == null) {
+            throw new IllegalStateException("Donation order not found. merchantTradeNo=" + merchantTradeNo);
+        }
+        if ("SUCCESS".equals(existingOrder.getStatus())) {
+            log.info("ECPay paid callback is already handled. merchantTradeNo={}", merchantTradeNo);
+            return 0;
+        }
+
         int updatedRows = donationOrderMapper.markPaidSuccess(merchantTradeNo, ecpayTradeNo, rtnCode, rtnMsg);
         if (updatedRows == 0) {
-            log.warn("ECPay paid callback did not match any donation order. merchantTradeNo={}", merchantTradeNo);
+            DonationOrder latestOrder = donationOrderMapper.findByMerchantTradeNo(merchantTradeNo);
+            if (latestOrder != null && "SUCCESS".equals(latestOrder.getStatus())) {
+                log.info("ECPay paid callback was handled by another request. merchantTradeNo={}", merchantTradeNo);
+                return 0;
+            }
+            throw new IllegalStateException("Failed to mark donation order as paid. merchantTradeNo=" + merchantTradeNo);
         }
         return updatedRows;
     }
