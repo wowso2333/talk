@@ -15,9 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -48,8 +52,17 @@ public class ArticleController {
     @Autowired
     private ObjectMapper objectMapper;  // 注入 ObjectMapper
 
+    @Autowired
+    private S3Client s3Client;
+
     @Value("${cache.ttl-jitter-percent:20}")
     private int cacheTtlJitterPercent;
+
+    @Value("${r2.bucket}")
+    private String r2BucketName;
+
+    @Value("${r2.public-url:}")
+    private String r2PublicUrl;
 
 
     @GetMapping("/test")
@@ -234,7 +247,9 @@ public class ArticleController {
     @DeleteMapping("/delete")
     public String deleteArticle(@RequestParam int articleId){
         try {
+            ArticleDTO article = userMapper.selectArticleById(articleId);
             userMapper.deleteArticle(articleId);
+            deleteArticleImagesFromR2(article);
             invalidateArticleCaches(articleId);
             return "delete article success";
         } catch (Exception e) {
@@ -524,6 +539,54 @@ public class ArticleController {
 
     private void invalidateSpecificArticleCache(int articleId) {
         deleteCache(SPECIFIC_ARTICLE_KEY + "_" + articleId);
+    }
+
+    private void deleteArticleImagesFromR2(ArticleDTO article) {
+        if (article == null || article.getContent() == null || article.getContent().isBlank()) {
+            return;
+        }
+
+        if (r2PublicUrl == null || r2PublicUrl.isBlank()) {
+            logger.warn("Skip deleting article images from R2 because r2.public-url is not configured. articleId={}",
+                    article.getArticleId());
+            return;
+        }
+
+        Set<String> keys = extractR2ObjectKeys(article.getContent());
+        for (String key : keys) {
+            try {
+                DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                        .bucket(r2BucketName)
+                        .key(key)
+                        .build();
+                s3Client.deleteObject(deleteObjectRequest);
+            } catch (Exception e) {
+                logger.warn("Failed to delete article image from R2. articleId={}, key={}",
+                        article.getArticleId(), key, e);
+            }
+        }
+    }
+
+    private Set<String> extractR2ObjectKeys(String content) {
+        Set<String> keys = new HashSet<>();
+        String normalizedPublicUrl = r2PublicUrl.replaceAll("/+$", "");
+
+        Document doc = Jsoup.parse(content);
+        for (Element img : doc.select("img[src]")) {
+            String src = img.attr("src");
+            if (src == null || src.isBlank()) {
+                continue;
+            }
+
+            if (src.startsWith(normalizedPublicUrl + "/")) {
+                String key = src.substring((normalizedPublicUrl + "/").length());
+                if (!key.isBlank()) {
+                    keys.add(key);
+                }
+            }
+        }
+
+        return keys;
     }
 
 }

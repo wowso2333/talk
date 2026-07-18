@@ -8,27 +8,34 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import java.net.URI;
+
 @Configuration
 public class S3Config {
 
-    @Value("${cloud.aws.credentials.accessKey}")
+    @Value("${r2.access-key-id}")
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.secretKey}")
+    @Value("${r2.secret-access-key}")
     private String secretKey;
 
-    @Value("${cloud.aws.region.static}")
+    @Value("${r2.region}")
     private String region;
+
+    @Value("${r2.endpoint}")
+    private String endpoint;
 
     @Bean
     public S3Client s3Client() {
-        // 從配置文件中讀取 AWS 憑證和區域
+        // Cloudflare R2 相容 AWS S3 SDK v2，憑證從環境變數注入，避免寫死金鑰。
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKey, secretKey);
 
-        // 配置 S3 客戶端，設置區域和憑證提供者
+        // R2 需指定 endpointOverride，region 使用 auto，並建議使用 path-style。
         return S3Client.builder()
-                .region(Region.of(region)) // 使用從配置文件中讀取的區域
+                .endpointOverride(URI.create(endpoint))
+                .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
+                .forcePathStyle(true)
                 .build();
     }
 }
