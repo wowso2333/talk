@@ -1,8 +1,9 @@
 import axios from "axios";
 import { jsonApiClient } from "./jsonApiClient";
-import { parsePath } from "react-router-dom";
 
-const API_BASE_URL = 'http://localhost:8080';
+// CRA's development proxy forwards /login directly; Vercel uses /api/login
+// and removes the /api prefix through vercel.json.
+const API_BASE_URL = process.env.NODE_ENV === 'development' ? '' : '/api';
 
 export const register = async (user) => {
     try {
