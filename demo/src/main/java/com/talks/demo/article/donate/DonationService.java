@@ -23,6 +23,7 @@ public class DonationService {
     @Transactional
     public String createEcpayOrder(Long articleId, Double amount) {
         if (amount == null || amount <= 0) {
+            log.warn("payment_event=order_rejected provider=ecpay articleId={} reason=invalid_amount", articleId);
             throw new IllegalArgumentException("amount must be greater than 0");
         }
 
@@ -37,6 +38,8 @@ public class DonationService {
         donationOrder.setAmount(BigDecimal.valueOf(totalAmount));
         donationOrder.setStatus("PENDING");
         donationOrderMapper.insert(donationOrder);
+        log.info("payment_event=order_created provider=ecpay merchantTradeNo={} articleId={} amount={} status=PENDING",
+                merchantTradeNo, articleId, donationOrder.getAmount());
 
         Map<String, String> params = new HashMap<>();
         params.put("MerchantID", ecpayConfig.getMerchantId());
@@ -50,11 +53,6 @@ public class DonationService {
         params.put("ChoosePayment", "ALL");
         params.put("ClientBackURL", ecpayConfig.getClientBackUrl());
         params.put("EncryptType", "1");
-        log.info("Creating ECPay donation order. merchantTradeNo={}, returnUrl={}, clientBackUrl={}",
-                merchantTradeNo,
-                ecpayConfig.getReturnUrl(),
-                ecpayConfig.getClientBackUrl());
-
         Map<String, String> macParams = new HashMap<>(params);
 
         // 產生 CheckMacValue（原文）
@@ -70,10 +68,12 @@ public class DonationService {
     public int markPaidSuccess(String merchantTradeNo, String ecpayTradeNo, String rtnCode, String rtnMsg) {
         DonationOrder existingOrder = donationOrderMapper.findByMerchantTradeNo(merchantTradeNo);
         if (existingOrder == null) {
+            log.error("payment_event=callback_order_not_found provider=ecpay merchantTradeNo={}", merchantTradeNo);
             throw new IllegalStateException("Donation order not found. merchantTradeNo=" + merchantTradeNo);
         }
         if ("SUCCESS".equals(existingOrder.getStatus())) {
-            log.info("ECPay paid callback is already handled. merchantTradeNo={}", merchantTradeNo);
+            log.info("payment_event=callback_duplicate provider=ecpay merchantTradeNo={} status=SUCCESS",
+                    merchantTradeNo);
             return 0;
         }
 
@@ -81,11 +81,16 @@ public class DonationService {
         if (updatedRows == 0) {
             DonationOrder latestOrder = donationOrderMapper.findByMerchantTradeNo(merchantTradeNo);
             if (latestOrder != null && "SUCCESS".equals(latestOrder.getStatus())) {
-                log.info("ECPay paid callback was handled by another request. merchantTradeNo={}", merchantTradeNo);
+                log.info("payment_event=callback_duplicate provider=ecpay merchantTradeNo={} status=SUCCESS reason=concurrent_request",
+                        merchantTradeNo);
                 return 0;
             }
+            log.error("payment_event=payment_update_failed provider=ecpay merchantTradeNo={} rtnCode={}",
+                    merchantTradeNo, rtnCode);
             throw new IllegalStateException("Failed to mark donation order as paid. merchantTradeNo=" + merchantTradeNo);
         }
+        log.info("payment_event=payment_succeeded provider=ecpay merchantTradeNo={} ecpayTradeNo={} amount={} articleId={} updatedRows={}",
+                merchantTradeNo, ecpayTradeNo, existingOrder.getAmount(), existingOrder.getArticleId(), updatedRows);
         return updatedRows;
     }
 

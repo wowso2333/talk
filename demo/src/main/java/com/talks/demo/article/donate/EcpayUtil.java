@@ -8,8 +8,6 @@ import org.springframework.util.DigestUtils;
 public class EcpayUtil {
 
     public static String generateCheckMacValue(Map<String, String> params, String hashKey, String hashIv, int encryptType) {
-        System.out.println("debug hashIv: " + hashIv);
-
         // Step 1：複製參數並移除不要算進check value的
         Map<String, String> tempMap = new HashMap<>(params);
         tempMap.remove("CheckMacValue");
@@ -35,11 +33,9 @@ public class EcpayUtil {
         sb.append("HashIV=").append(hashIv);
 
         String raw = sb.toString();
-        System.out.println("🔹Step 2 原始待加密字串：\n" + raw);
 
         // Step 4：使用 .NET 標準 URL Encode + toLowerCase
         String encoded = netUrlEncode(raw).toLowerCase();
-        System.out.println("🔹Step 3 URL encoded (.NET 版)：\n" + encoded);
 
         // Step 5：進行雜湊加密（SHA256 或 MD5）
         String hash = "";

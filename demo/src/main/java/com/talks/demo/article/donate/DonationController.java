@@ -32,15 +32,16 @@ public class DonationController {
         Map<String, String[]> parameterMap = request.getParameterMap();
         Map<String, String> params = new HashMap<>();
         parameterMap.forEach((key, values) -> params.put(key, values[0]));
-        log.info("Received ECPay callback. merchantTradeNo={}, rtnCode={}, params={}",
-                params.get("MerchantTradeNo"), params.get("RtnCode"), params);
+        log.info("payment_event=callback_received provider=ecpay merchantTradeNo={} ecpayTradeNo={} rtnCode={}",
+                params.get("MerchantTradeNo"), params.get("TradeNo"), params.get("RtnCode"));
 
         // 驗證簽章
         boolean isValid = new EcpayUtil().verifyCheckMacValue(params, ecpayConfig.getHashKey(), ecpayConfig.getHashIv());
 
         if (!isValid) {
             // 驗證失敗
-            log.warn("ECPay callback CheckMacValue failed. merchantTradeNo={}", params.get("MerchantTradeNo"));
+            log.warn("payment_event=callback_signature_invalid provider=ecpay merchantTradeNo={}",
+                    params.get("MerchantTradeNo"));
             return ResponseEntity.badRequest().body("0|CheckMacValue Error");
         }
 
@@ -55,11 +56,21 @@ public class DonationController {
                     rtnCode,
                     params.get("RtnMsg")
             );
-            log.info("Updated donation order after ECPay paid callback. merchantTradeNo={}, updatedRows={}",
+            log.debug("payment_event=callback_acknowledged provider=ecpay merchantTradeNo={} updatedRows={}",
                     merchantTradeNo, updatedRows);
+        } else {
+            log.warn("payment_event=payment_not_succeeded provider=ecpay merchantTradeNo={} ecpayTradeNo={} rtnCode={} rtnMsg={}",
+                    merchantTradeNo, params.get("TradeNo"), rtnCode, sanitizeLogValue(params.get("RtnMsg")));
         }
 
         return ResponseEntity.ok("1|OK");
+    }
+
+    private static String sanitizeLogValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace('\n', '_').replace('\r', '_');
     }
 
 }
