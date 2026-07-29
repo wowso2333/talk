@@ -12,7 +12,7 @@ services:
       - db
       - my-redis
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/talks
+      #- SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/talks
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=123456
       - SPRING_DATA_REDIS_HOST=my-redis
