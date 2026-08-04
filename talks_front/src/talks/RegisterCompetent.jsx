@@ -19,13 +19,13 @@ export default function RegisterComponent() {
 
     // 頭像圖片的列表
     const avatars = [
-        { avatarName:'yellowET', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/yellowPinkET.png' },
-        { avatarName:'Hedgehog', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/Hedgehog.png' },
-        { avatarName:'Chimpanzees', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/Chimpanzees.png'},
-        { avatarName:'flower', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/flower.png' },
-        { avatarName:'pinkET', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/pinkET.png' },
-        { avatarName:'penguin_l', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/penguin_l.png' },
-        { avatarName:'penguin_r', src: 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/penguin_r.png'},
+        { avatarName:'yellowET', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/yellowPinkET.png' },
+        { avatarName:'Hedgehog', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/hedgehog.png' },
+        { avatarName:'Chimpanzees', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/Chimpanzees.png'},
+        { avatarName:'flower', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/flower.png' },
+        { avatarName:'pinkET', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/deepPinkET.png' },
+        { avatarName:'penguin_l', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/penguin_l.png' },
+        { avatarName:'penguin_r', src: 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/penguin_r.png'},
     ];
 
     async function handleSubmit(event) {
