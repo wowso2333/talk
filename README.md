@@ -49,5 +49,6 @@
 
 **選擇抖內金額，用新臺幣支持網站營運**
 - 串接綠界金流
-<img width="1833" height="960" alt="螢幕快照 2026-08-04 17-15-29" src="https://github.com/user-attachments/assets/01a7c782-9eef-4fb8-9862-c376c7dfeb2f" />
+<img width="1816" height="647" alt="螢幕快照 2026-08-04 18-08-05" src="https://github.com/user-attachments/assets/024f4d9a-509c-4ffe-acd4-b28617c323ed" />
+
 <img width="1833" height="960" alt="螢幕快照 2026-08-04 17-15-42" src="https://github.com/user-attachments/assets/5d3f1727-2053-45f1-af37-0f8953df52a7" />
