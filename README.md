@@ -3,7 +3,7 @@
 文章系統：使用者可以發佈文章並在文章下留言、按讚，並可篩選最新與熱門文章。
 
 ## 請搜尋以下網址進入網站
-[talks-rust-tau.vercel.app  ](https://talk-kappa-seven.vercel.app/)
+[talks-rust-tau.vercel.app  ](https://talk-phi-six.vercel.app/)
 
 帳號:admi  
 密碼:aaa
@@ -44,7 +44,7 @@
 <img width="1824" height="910" alt="438122747-1c3c617b-ad46-4a82-b917-fde280ed5958" src="https://github.com/user-attachments/assets/7b2e95bd-f717-49a0-acbe-0bb2a414f439" />
 
 **根據關鍵字推薦相關搜尋詞**
-<img width="815" height="124" alt="螢幕快照 2026-08-04 17-58-47" src="https://github.com/user-attachments/assets/5dd15725-bf7a-4262-88ba-eac2627ed356" />
+<img width="1524" height="775" alt="螢幕快照 2026-08-04 18-06-41" src="https://github.com/user-attachments/assets/648a05e9-19b8-4852-a2a1-ba460268a44a" />
 
 
 **選擇抖內金額，用新臺幣支持網站營運**
