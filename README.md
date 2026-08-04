@@ -43,5 +43,11 @@
 **修改密碼與刪除帳號**
 <img width="1824" height="910" alt="438122747-1c3c617b-ad46-4a82-b917-fde280ed5958" src="https://github.com/user-attachments/assets/7b2e95bd-f717-49a0-acbe-0bb2a414f439" />
 
+**根據關鍵字推薦相關搜尋詞**
+<img width="815" height="124" alt="螢幕快照 2026-08-04 17-58-47" src="https://github.com/user-attachments/assets/5dd15725-bf7a-4262-88ba-eac2627ed356" />
 
-  
+
+**選擇抖內金額，用新臺幣支持網站營運**
+- 串接綠界金流
+<img width="1833" height="960" alt="螢幕快照 2026-08-04 17-15-29" src="https://github.com/user-attachments/assets/01a7c782-9eef-4fb8-9862-c376c7dfeb2f" />
+<img width="1833" height="960" alt="螢幕快照 2026-08-04 17-15-42" src="https://github.com/user-attachments/assets/5d3f1727-2053-45f1-af37-0f8953df52a7" />
