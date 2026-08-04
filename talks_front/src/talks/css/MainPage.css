@@ -12,8 +12,11 @@
 }
 
 .mainPage_img{
-    width: 15%;
-    height: 15%;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .mainPage_ArticleImg{
@@ -149,7 +152,6 @@ display: none; /* 適用於 Chrome、Safari 和 Opera 隱藏滾動條 */
 .mainPage_messageInput{
     height: 25px !important; 
 }
-
 
 
 
