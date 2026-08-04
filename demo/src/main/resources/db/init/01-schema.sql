@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS donation_order (
 
 INSERT INTO user (id, username, password, role, enabled, avatar)
 VALUES
-  (1, 'admi', 'aaa', 'ROLE_USER', TRUE, 'https://elasticbeanstalk-ap-northeast-3-460820365574.s3.ap-northeast-3.amazonaws.com/yellowPinkET.png')
+  (1, 'admi', 'aaa', 'ROLE_USER', TRUE, 'https://pub-a6e3ecd4dae44a458f3b709c3bcaf948.r2.dev/avat2/flower.png')
 ON DUPLICATE KEY UPDATE username = VALUES(username);
 
 INSERT INTO boards (id, board_name, img_url, slogan, recommend)
