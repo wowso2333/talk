@@ -117,14 +117,16 @@ export default function Sidebar( {fetchFavBoardArticles } ) {
                         <img src={img.imgUrl} alt={img.boardName} className='mainPage_img rounded-circle me-3' />
                         <p className='text-white fw-bold fs-5 m-0'>{img.boardName}</p>
                     </div>
-                    <FaStar
-                        className = "col-2" 
-                        style={{
-                            cursor: 'pointer',
-                            color: starredItems[img.id] ? 'rgb(132, 78, 240)' : 'rgb(41, 13, 97)'
-                        }} 
-                        onClick={() => handleStarClick(img.id)}
-                    />
+                    <div className="col-2 d-flex justify-content-end align-items-center">
+                        <FaStar
+                            className="sideBar_star"
+                            style={{
+                                cursor: 'pointer',
+                                color: starredItems[img.id] ? 'rgb(132, 78, 240)' : 'rgb(41, 13, 97)'
+                            }}
+                            onClick={() => handleStarClick(img.id)}
+                        />
+                    </div>
                 </button> 
             ))}
         </div>

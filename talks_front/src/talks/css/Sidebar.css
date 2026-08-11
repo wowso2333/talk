@@ -1,6 +1,8 @@
 .sideBar_star{
-    width: 10px !important;
-    font-size: 70px !important;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    flex-shrink: 0;
 }
 
 .sidebar{
@@ -11,6 +13,7 @@
 
 .sidebar_button{
     background-color: rgb(68, 22, 159) !important;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
 }
-
-
