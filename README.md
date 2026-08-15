@@ -14,7 +14,7 @@
 - 結合Bootstrap完成網頁版面設置
 - 使用index加速MySQL查詢效率
 - 使用Redis存取熱門文章快取
-- 以S3儲存使用者上傳的圖片
+- 以R2儲存使用者上傳的圖片
 - 前端部署在vercel，後端部屬在railway
 <img width="1366" height="619" alt="438120373-247905bf-596f-4c2b-81ed-2648bcb63365" src="https://github.com/user-attachments/assets/b809a0d2-ee96-492b-9a6e-53a165cc40c2" />
 <img width="579" height="503" alt="438120676-69ef2d9a-c6c0-4e1a-abf3-ccca5cabcd1b" src="https://github.com/user-attachments/assets/01ede970-15b5-4463-86f7-02539fac2fd0" />
