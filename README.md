@@ -16,7 +16,8 @@
 - 使用Redis存取熱門文章快取
 - 以R2儲存使用者上傳的圖片
 - 前端部署在vercel，後端部屬在railway
-<img width="1366" height="619" alt="438120373-247905bf-596f-4c2b-81ed-2648bcb63365" src="https://github.com/user-attachments/assets/b809a0d2-ee96-492b-9a6e-53a165cc40c2" />
+  
+<img width="1366" height="617" alt="R2" src="https://github.com/user-attachments/assets/0c236920-21a7-4f1a-87cb-7f08291954d7" />
 <img width="579" height="503" alt="438120676-69ef2d9a-c6c0-4e1a-abf3-ccca5cabcd1b" src="https://github.com/user-attachments/assets/01ede970-15b5-4463-86f7-02539fac2fd0" />
 
 
