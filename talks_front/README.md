@@ -2,6 +2,25 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Google Analytics 4
+
+The app tracks the initial page load and React Router navigation as GA4
+`page_view` events. Tracking stays disabled when the measurement ID is absent.
+
+For local development, copy `.env.example` to `.env.local` and replace the
+placeholder with the GA4 web stream Measurement ID (`G-...`). Restart the
+development server after changing environment variables.
+
+For Railway, add this service variable and redeploy the frontend:
+
+```text
+REACT_APP_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+Create React App embeds environment variables at build time, so a redeploy is
+required whenever this value changes. The measurement ID is a public website
+identifier and is not a secret.
+
 ## Available Scripts
 
 In the project directory, you can run:

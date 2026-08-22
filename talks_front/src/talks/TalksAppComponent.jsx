@@ -1,5 +1,5 @@
 import {BrowserRouter, Routes, Route, Navigate, useLocation} from 'react-router-dom'
-import React from 'react';
+import React, { useEffect } from 'react';
 import AuthProvider, { useAuth } from './security/AuthContext.js'
 import LetStartComponent from './LetStartComponent.jsx'
 import LoginComponent from './LoginComponent.jsx'
@@ -14,6 +14,17 @@ import UpdateComponent from './UpdateComponent.jsx';
 import AllBoardComponent from './AllBoardComponent.jsx';
 import SearchResultComponent from './SearchResultComponent.jsx'
 import DnonateSuccessComponent from './DnonateSuccessComponent.jsx'
+import { trackPageView } from '../analytics.js'
+
+function AnalyticsTracker() {
+    const location = useLocation()
+
+    useEffect(() => {
+        trackPageView(location.pathname)
+    }, [location.pathname])
+
+    return null
+}
 
 function AuthenticatedRoute({children}) {
     const authContext = useAuth()
@@ -42,6 +53,7 @@ export default function TalksAppComponent() {
         <div className="TodoApp">
             <AuthProvider>
                 <BrowserRouter>
+                    <AnalyticsTracker />
                     <LayoutWithHeader>
                         <Routes>
                             <Route path='/' element={ <LetStartComponent /> } />
